@@ -1,0 +1,123 @@
+Azure Files — Create and Use with Azure CLI
+1. Create a Resource Group
+az group create \
+  --name rg-file-demo \
+  --location eastus
+2. Create a Storage Account
+az storage account create \
+  --name mystoragefile12345 \
+  --resource-group rg-file-demo \
+  --location eastus \
+  --sku Standard_LRS \
+  --kind StorageV2
+
+Storage account names must be globally unique and contain only lowercase letters and numbers.
+
+3. Get the Storage Account Key
+az storage account keys list \
+  --resource-group rg-file-demo \
+  --account-name mystoragefile12345
+
+You can save the key into a variable:
+
+STORAGE_KEY=$(az storage account keys list \
+  --resource-group rg-file-demo \
+  --account-name mystoragefile12345 \
+  --query "[0].value" \
+  --output tsv)
+4. Create an Azure File Share
+az storage share create \
+  --name employees \
+  --account-name mystoragefile12345 \
+  --account-key $STORAGE_KEY
+
+Now you have:
+
+Storage Account
+      |
+      └── File Share: employees
+5. Create a Directory
+
+For example, create an HR directory:
+
+az storage directory create \
+  --share-name employees \
+  --name HR \
+  --account-name mystoragefile12345 \
+  --account-key $STORAGE_KEY
+
+You can create another directory:
+
+az storage directory create \
+  --share-name employees \
+  --name Finance \
+  --account-name mystoragefile12345 \
+  --account-key $STORAGE_KEY
+
+The structure becomes:
+
+employees
+│
+├── HR
+│
+└── Finance
+6. Upload a File
+
+Suppose you have:
+
+C:\Training\employee.xlsx
+
+Upload it into the HR directory:
+
+az storage file upload \
+  --share-name employees \
+  --source "C:\Training\employee.xlsx" \
+  --path HR/employee.xlsx \
+  --account-name mystoragefile12345 \
+  --account-key $STORAGE_KEY
+7. List Files
+az storage file list \
+  --share-name employees \
+  --path HR \
+  --account-name mystoragefile12345 \
+  --account-key $STORAGE_KEY \
+  --output table
+
+Example output:
+
+Name             Content Length
+---------------  --------------
+employee.xlsx    24576
+8. Download the File
+az storage file download \
+  --share-name employees \
+  --path HR/employee.xlsx \
+  --dest ./employee.xlsx \
+  --account-name mystoragefile12345 \
+  --account-key $STORAGE_KEY
+9. Delete the File
+az storage file delete \
+  --share-name employees \
+  --path HR/employee.xlsx \
+  --account-name mystoragefile12345 \
+  --account-key $STORAGE_KEY
+Complete practical scenario
+
+You can explain Azure Files to students like this:
+
+Company
+   |
+   ↓
+Azure Storage Account
+   |
+   └── File Share: employees
+          |
+          ├── HR
+          │    ├── employee.xlsx
+          │    └── salaries.xlsx
+          |
+          └── Finance
+               ├── invoices.pdf
+               └── budget.xlsx
+
+Use case: A company wants a shared file location in Azure where Windows/Linux servers, applications, and users can access common documents. Azure Files provides managed file shares that can be accessed through SMB (and, for supported configurations, NFS), rather than storing individual objects like Azure Blob Storage.

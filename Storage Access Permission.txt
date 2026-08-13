@@ -1,0 +1,19 @@
+1. Public download — simplest
+
+If the files are intended to be publicly downloadable:
+
+Open Azure Portal → Storage accounts.
+Select your storage account.
+Go to Configuration.
+Set Allow Blob anonymous access = Enabled.
+Open Data storage → Containers.
+Select your container.
+Change Anonymous access level to:
+Blob – users can download blobs if they know the URL.
+Container – users can list and download blobs.
+
+A file can then be accessed using a URL such as:
+
+https://<storage-account>.blob.core.windows.net/<container>/<file>
+
+⚠️ For corporate/production environments, avoid public access unless the files are genuinely public.

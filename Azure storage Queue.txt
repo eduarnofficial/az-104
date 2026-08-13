@@ -1,0 +1,92 @@
+Azure Storage Queue
+
+Azure Queue Storage is a service for storing messages between application components. It is commonly used to decouple a web application from background processing.
+
+Simple real-world example
+
+Imagine an e-commerce application.
+
+A customer places an order:
+
+Customer
+   ↓
+Web Application
+   ↓
+Azure Queue Storage
+   ↓
+Background Worker
+   ↓
+Process Order
+
+Instead of making the web application process everything immediately, it puts a message into the queue:
+
+OrderId: 1001
+Customer: Ravi
+Product: Laptop
+Action: ProcessOrder
+
+The background application reads the message and processes the order.
+
+Why use a queue?
+
+Without a queue:
+
+Web App → Database → Payment → Email → Inventory
+
+If the email service or inventory system is slow, the customer may have to wait.
+
+With a queue:
+
+Web App
+   ↓
+Queue
+   ↓
+Background Worker
+   ├── Payment
+   ├── Inventory
+   └── Email
+
+The web application can respond quickly while the worker processes the job asynchronously.
+
+Key Azure Queue Storage concepts
+Concept	Meaning
+Storage Account	Container for Azure Storage services
+Queue	Collection of messages
+Message	Individual piece of work/data
+Producer	Application that adds messages
+Consumer	Application that reads/processes messages
+Visibility Timeout	Temporarily hides a message while being processed
+Dequeue	Reading/removing a message from normal availability
+TTL	How long a message can remain in the queue
+Example
+
+Create a queue called:
+
+order-processing
+
+Producer adds:
+
+Order 1001
+
+Then:
+
+order-processing
+----------------
+Order 1001
+Order 1002
+Order 1003
+
+A worker reads Order 1001, processes it, and then deletes the message.
+
+Important AZ-104 distinction
+
+Blob Storage → Store files
+Table Storage → Store NoSQL structured data
+Queue Storage → Store messages/work items
+Azure Files → Managed file shares
+
+A good exam question is:
+
+"A company needs to decouple a web application from a background processing service. What Azure Storage service should be used?"
+
+Answer: Azure Queue Storage.
